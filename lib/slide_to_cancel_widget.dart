@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SlideToCancelButton extends StatefulWidget {
   const SlideToCancelButton({Key? key}) : super(key: key);
@@ -21,6 +22,8 @@ class _SlideToCancelButtonState extends State<SlideToCancelButton> {
 
   double get paddingDragCorrection => isActive ? min(dragValue / 10, 15) : 0;
 
+  double get buttonPadding => paddingInitial - paddingDragCorrection;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -32,13 +35,17 @@ class _SlideToCancelButtonState extends State<SlideToCancelButton> {
           AnimatedPositioned(
             right: dragValue - paddingInitial + 30,
             duration: duration,
+            curve: const ElasticOutCurve(0.85),
             child: GestureDetector(
+              onLongPressStart: (details) {
+                HapticFeedback.heavyImpact();
+              },
               onLongPressMoveUpdate: (details) {
                 if (details.localPosition.dx < 0) {
                   if (details.localPosition.dx < -170) {
                     setState(() {
                       isActive = false;
-                      duration = const Duration(milliseconds: 100);
+                      duration = const Duration(milliseconds: 200);
                       dragValue = 0;
                     });
                   } else {
@@ -56,18 +63,24 @@ class _SlideToCancelButtonState extends State<SlideToCancelButton> {
               },
               onLongPressEnd: (details) {
                 setState(() {
-                  duration = const Duration(milliseconds: 100);
+                  duration = const Duration(milliseconds: 200);
                   isActive = false;
                   dragValue = 0;
                 });
               },
-              child: Container(
-                padding: EdgeInsets.all(paddingInitial - paddingDragCorrection),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50.0),
-                  color: _getColor,
+              child: Material(
+                color: _getColor,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  onTap: () {
+                    HapticFeedback.heavyImpact();
+                  },
+                  customBorder: const CircleBorder(),
+                  child: Padding(
+                    padding: EdgeInsets.all(buttonPadding),
+                    child: const Icon(Icons.mic_none, color: Colors.white),
+                  ),
                 ),
-                child: const Icon(Icons.mic_none, color: Colors.white),
               ),
             ),
           ),

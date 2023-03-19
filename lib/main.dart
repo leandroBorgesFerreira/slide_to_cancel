@@ -38,7 +38,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
         height: 150,
-        width: double.infinity,
         color: Colors.green,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Align(
